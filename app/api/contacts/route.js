@@ -22,13 +22,15 @@ export async function GET() {
   if (!sql) return Response.json({ error: 'Databáze není připojena' }, { status: 503 })
   await prepare(sql)
   let rows = await sql`SELECT contacts, updated_at FROM sunpower_state WHERE id = 1`
+  let initialized = false
   if (!rows.length) {
+    initialized = true
     const value = JSON.stringify(initialContacts)
     rows = await sql`INSERT INTO sunpower_state (id, contacts) VALUES (1, ${value}::jsonb)
       ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id
       RETURNING contacts, updated_at`
   }
-  return Response.json({ contacts: rows[0].contacts, updatedAt: rows[0].updated_at }, { headers: { 'Cache-Control': 'no-store' } })
+  return Response.json({ contacts: rows[0].contacts, updatedAt: rows[0].updated_at, initialized }, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 export async function PUT(request) {

@@ -37,7 +37,9 @@ export default function Home() {
         const response = await fetch('/api/contacts', { cache: 'no-store' })
         if (response.ok) {
           const data = await response.json()
-          setContacts(data.contacts); setOnlineSync(true); setSyncState('saved'); setReady(true); return
+          const saved = localStorage.getItem(STORAGE)
+          setContacts(data.initialized && saved ? JSON.parse(saved) : data.contacts)
+          setOnlineSync(true); setSyncState('saved'); setReady(true); return
         }
       } catch {}
       const saved = localStorage.getItem(STORAGE)
