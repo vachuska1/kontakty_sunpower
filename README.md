@@ -16,7 +16,7 @@ Telefonní číslo otevře běžné volání. Změny se průběžně ukládají 
 
 ## Důležité k ukládání
 
-Současná verze ukládá data v prohlížeči telefonu. Funguje bez účtu a i po zavření aplikace, ale změny se automaticky nesynchronizují mezi dvěma telefony. Pro sdílené živé úpravy více lidí je potřeba připojit databázi (například Supabase) a přihlášení.
+Aplikace používá společnou Neon Postgres databázi, pokud je ve Vercelu dostupná proměnná `DATABASE_URL`. Bez ní automaticky přejde na místní ukládání v prohlížeči. Uživatelé se nepřihlašují; kdokoliv se znalostí adresy aplikace může data zobrazit a upravovat.
 
 ## Aktualizace kontaktů
 

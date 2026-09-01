@@ -22,6 +22,8 @@ const localDateTime = value => {
 export default function Home() {
   const [contacts, setContacts] = useState([])
   const [ready, setReady] = useState(false)
+  const [onlineSync, setOnlineSync] = useState(false)
+  const [syncState, setSyncState] = useState('local')
   const [type, setType] = useState('elektrikari')
   const [view, setView] = useState('cards')
   const [query, setQuery] = useState('')
@@ -30,11 +32,44 @@ export default function Home() {
   const [editing, setEditing] = useState(null)
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE)
-    if (saved) { setContacts(JSON.parse(saved)); setReady(true); return }
-    fetch('/contacts.json').then(r => r.json()).then(data => { setContacts(data); setReady(true) })
+    async function load() {
+      try {
+        const response = await fetch('/api/contacts', { cache: 'no-store' })
+        if (response.ok) {
+          const data = await response.json()
+          setContacts(data.contacts); setOnlineSync(true); setSyncState('saved'); setReady(true); return
+        }
+      } catch {}
+      const saved = localStorage.getItem(STORAGE)
+      if (saved) setContacts(JSON.parse(saved))
+      else setContacts(await fetch('/contacts.json').then(r => r.json()))
+      setReady(true)
+    }
+    load()
   }, [])
-  useEffect(() => { if (ready) localStorage.setItem(STORAGE, JSON.stringify(contacts)) }, [contacts, ready])
+  useEffect(() => {
+    if (!ready) return
+    localStorage.setItem(STORAGE, JSON.stringify(contacts))
+    if (!onlineSync) return
+    setSyncState('saving')
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch('/api/contacts', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contacts }) })
+        setSyncState(response.ok ? 'saved' : 'error')
+      } catch { setSyncState('error') }
+    }, 700)
+    return () => clearTimeout(timer)
+  }, [contacts, ready, onlineSync])
+  useEffect(() => {
+    if (!onlineSync) return
+    const timer = setInterval(async () => {
+      try {
+        const response = await fetch('/api/contacts', { cache: 'no-store' })
+        if (response.ok) setContacts((await response.json()).contacts)
+      } catch {}
+    }, 15000)
+    return () => clearInterval(timer)
+  }, [onlineSync])
 
   const list = useMemo(() => contacts.filter(c => {
     const hay = `${c.name} ${c.profession} ${c.address} ${c.city} ${c.postalCode} ${c.district} ${c.phone} ${c.email} ${c.services} ${c.note}`.toLocaleLowerCase('cs')
@@ -71,7 +106,7 @@ export default function Home() {
   if (!ready) return <main className="loading">Načítám kontakty…</main>
   return <div className="app-shell">
     <header>
-      <div><small>SUNPOWER</small><h1>Kontakty</h1></div>
+      <div><small>SUNPOWER</small><h1>Kontakty <span className={`sync ${syncState}`}>{onlineSync ? (syncState === 'saving' ? 'ukládám…' : syncState === 'error' ? 'chyba ukládání' : 'online') : 'toto zařízení'}</span></h1></div>
       <div className="header-actions">
         <button className="square" onClick={() => setView(view === 'cards' ? 'table' : 'cards')} aria-label="Změnit zobrazení">{view === 'cards' ? '▦' : '▤'}</button>
         <button className="primary" onClick={() => setEditing(emptyForm)}>＋ Přidat</button>
