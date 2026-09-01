@@ -80,6 +80,21 @@ export default function Home() {
   function patch(id, values) {
     setContacts(items => items.map(c => c.id === id ? { ...c, ...values } : c))
   }
+  async function saveNow() {
+    if (!onlineSync) {
+      alert('Společná databáze zatím není připojena. Změny jsou uložené pouze v tomto zařízení.')
+      return
+    }
+    setSyncState('saving')
+    try {
+      const response = await fetch('/api/contacts', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contacts }) })
+      setSyncState(response.ok ? 'saved' : 'error')
+      if (!response.ok) alert('Změny se nepodařilo uložit do společné databáze.')
+    } catch {
+      setSyncState('error')
+      alert('Změny se nepodařilo uložit. Zkontrolujte internetové připojení.')
+    }
+  }
   function chooseStatus(contact, status) {
     const at = new Date().toISOString()
     patch(contact.id, { status, calledAt: at, history: [...(contact.history || []), { at, status, note: contact.note || '' }] })
@@ -108,6 +123,7 @@ export default function Home() {
     <header>
       <div><small>SUNPOWER</small><h1>Kontakty <span className={`sync ${syncState}`}>{onlineSync ? (syncState === 'saving' ? 'ukládám…' : syncState === 'error' ? 'chyba ukládání' : 'online') : 'toto zařízení'}</span></h1></div>
       <div className="header-actions">
+        <button className="save-button" onClick={saveNow}>✓ Uložit</button>
         <button className="square" onClick={() => setView(view === 'cards' ? 'table' : 'cards')} aria-label="Změnit zobrazení">{view === 'cards' ? '▦' : '▤'}</button>
         <button className="primary" onClick={() => setEditing(emptyForm)}>＋ Přidat</button>
       </div>
