@@ -147,7 +147,10 @@ export default function Home() {
       {current ? <ContactCard key={current.id} contact={current} patch={patch} chooseStatus={chooseStatus} startCall={startCall} edit={setEditing} remove={id=>{if(confirm('Opravdu smazat tento kontakt?'))setContacts(c=>c.filter(x=>x.id!==id))}} /> : <p className="empty">Žádný kontakt neodpovídá filtru.</p>}
     </main> : <ContactTable contacts={list} />}
 
-    {view === 'cards' && <footer><button onClick={()=>setIndex(i=>Math.max(0,i-1))}>← Předchozí</button><strong>{list.length ? Math.min(index+1,list.length) : 0} / {list.length}</strong><button onClick={()=>setIndex(i=>Math.min(list.length-1,i+1))}>Další →</button></footer>}
+    {view === 'cards' && <footer>
+      <div className="footer-main"><button onClick={()=>setIndex(i=>Math.max(0,i-1))}>← Předchozí</button><strong>{list.length ? Math.min(index+1,list.length) : 0} / {list.length}</strong><button onClick={()=>setIndex(i=>Math.min(list.length-1,i+1))}>Další →</button></div>
+      <div className="footer-jump"><button onClick={()=>setIndex(0)}>⇤ Na začátek {type === 'elektrikari' ? 'elektrikářů' : 'instalatérů'}</button><button onClick={()=>setIndex(Math.max(0,list.length-1))}>Na konec {type === 'elektrikari' ? 'elektrikářů' : 'instalatérů'} ⇥</button></div>
+    </footer>}
 
     <button className="export" onClick={exportCsv}>⇩ <span>Záloha CSV</span></button>
     {editing && <ContactDialog contact={editing} defaultType={type} close={()=>setEditing(null)} save={saveContact} />}
