@@ -109,7 +109,7 @@ export default function Home() {
     event.preventDefault()
     const values = Object.fromEntries(new FormData(event.currentTarget))
     if (editing?.id) patch(editing.id, values)
-    else setContacts(items => [...items, { ...values, id: crypto.randomUUID(), type, status: 'new', calledAt: '', followUp: '', history: [] }])
+    else setContacts(items => [...items, { id: crypto.randomUUID(), type: values.type || type, status: 'new', calledAt: '', followUp: '', history: [], ...values }])
     setEditing(null)
   }
   function exportCsv() {
@@ -150,7 +150,7 @@ export default function Home() {
     {view === 'cards' && <footer><button onClick={()=>setIndex(i=>Math.max(0,i-1))}>← Předchozí</button><strong>{list.length ? Math.min(index+1,list.length) : 0} / {list.length}</strong><button onClick={()=>setIndex(i=>Math.min(list.length-1,i+1))}>Další →</button></footer>}
 
     <button className="export" onClick={exportCsv}>⇩ <span>Záloha CSV</span></button>
-    {editing && <ContactDialog contact={editing} close={()=>setEditing(null)} save={saveContact} />}
+    {editing && <ContactDialog contact={editing} defaultType={type} close={()=>setEditing(null)} save={saveContact} />}
   </div>
 }
 
@@ -176,10 +176,11 @@ function ContactTable({ contacts }) {
   return <main className="table-wrap"><table><thead><tr><th>Stav</th><th>Firma / jméno</th><th>Profese</th><th>Co přesně dělá</th><th>Telefon</th><th>Adresa</th><th>Město</th><th>PSČ</th><th>Okres</th><th>Voláno</th><th>Další kontakt</th><th>Poznámka</th></tr></thead><tbody>{contacts.map(c=><tr className={statuses[c.status]?.[1]} key={c.id}><td>{statuses[c.status]?.[0]}</td><td><b>{c.name}</b></td><td>{c.profession}</td><td>{c.services}</td><td><a href={phoneLink(c.phone)}>{c.phone}</a></td><td>{c.address}</td><td>{c.city}</td><td>{c.postalCode}</td><td>{c.district}</td><td>{c.calledAt ? new Date(c.calledAt).toLocaleString('cs-CZ') : ''}</td><td>{c.followUp}</td><td>{c.note}</td></tr>)}</tbody></table></main>
 }
 
-function ContactDialog({ contact, close, save }) {
+function ContactDialog({ contact, defaultType, close, save }) {
   return <div className="modal" onMouseDown={e=>{if(e.target===e.currentTarget)close()}}><form onSubmit={save}>
     <div className="modal-head"><h2>{contact.id ? 'Upravit kontakt' : 'Nový kontakt'}</h2><button type="button" onClick={close}>×</button></div>
     <input type="hidden" name="id" defaultValue={contact.id || ''}/>
+    <label>Skupina<select name="type" defaultValue={contact.type || defaultType}><option value="elektrikari">⚡ Elektrikář</option><option value="instalateri">💧 Instalatér</option></select></label>
     <label>Firma nebo jméno<input name="name" required defaultValue={contact.name}/></label>
     <div className="two"><label>Profese<input name="profession" placeholder="Elektrikář / instalatér" defaultValue={contact.profession}/></label><label>Telefon<input name="phone" inputMode="tel" required defaultValue={contact.phone}/></label></div>
     <label>Co přesně dělá<input name="services" placeholder="Např. elektroinstalace, výkopové práce…" defaultValue={contact.services}/></label>
