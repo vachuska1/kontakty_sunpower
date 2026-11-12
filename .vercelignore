@@ -1,0 +1,8 @@
+backups
+tests
+scripts
+.env*
+.neon
+.git
+node_modules
+.next

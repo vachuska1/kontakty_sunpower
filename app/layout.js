@@ -2,7 +2,7 @@ import './globals.css'
 
 export const metadata = {
   title: 'Sunpower Kontakty',
-  description: 'Mobilní evidence kontaktů elektrikářů a instalatérů',
+  description: 'Evidence kontaktů pro Sunpower',
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: 'Kontakty', statusBarStyle: 'default' },
 }
