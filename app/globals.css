@@ -14,13 +14,17 @@
 .auth-form input { width: 100%; padding: 12px; box-sizing: border-box; }
 
 nav{grid-template-columns:repeat(4,minmax(0,1fr))}
-.contact-card.green-strong{border-color:#209447;background:#bcebc9}
-.contact-card.green-final{border-color:#087332;background:#77d998}
-tr.green-strong{background:#bcebc9}tr.green-final{background:#77d998}
-.status-buttons button.green{background:#e7f5eb;border-color:#4b9c68;color:#235334}
-.status-buttons button.green-strong{background:#bcebc9;border-color:#209447;color:#164c27}
-.status-buttons button.green-final{background:#77d998;border-color:#087332;color:#123c20}
-.status-buttons button.green.selected{background:#39794f;border-color:#39794f;color:white}
-.status-buttons button.green-strong.selected{background:#207739;border-color:#207739;color:white}
-.status-buttons button.green-final.selected{background:#075b27;border-color:#075b27;color:white}
+/* One palette for status labels, buttons, cards and table rows. */
+.neutral{--status-bg:#f4f4f4;--status-border:#babdbf;--status-text:#34383a}
+.green{--status-bg:#e7f5eb;--status-border:#4b9c68;--status-text:#235334}
+.green-strong{--status-bg:#bcebc9;--status-border:#209447;--status-text:#164c27}
+.green-final{--status-bg:#77d998;--status-border:#087332;--status-text:#123c20}
+.red{--status-bg:#fae8e8;--status-border:#c75151;--status-text:#7e2929}
+.orange{--status-bg:#fff0dc;--status-border:#db8d32;--status-text:#7b480c}
+.brown{--status-bg:#eee2d8;--status-border:#8b674e;--status-text:#66442d}
+.blue{--status-bg:#e8f1f8;--status-border:#5888ad;--status-text:#2a5270}
+.contact-card[class],.status-buttons button[class],.stats span[class],tr[class]{background:var(--status-bg);border-color:var(--status-border)}
+.status-buttons button[class],.stats span[class],.contact-card .badge{color:var(--status-text)}
+.status-buttons button.selected{outline:3px solid var(--status-border);outline-offset:-3px;box-shadow:0 0 0 1px var(--status-border)}
+.contact-card .badge{background:var(--status-bg);border:1px solid var(--status-border)}
 @media(max-width:560px){nav{grid-template-columns:repeat(2,minmax(0,1fr))}}

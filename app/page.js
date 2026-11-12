@@ -208,7 +208,7 @@ export default function Home() {
       <select value={filter} onChange={e=>{setFilter(e.target.value);setIndex(0)}}><option value="">Všechny stavy</option>{Object.entries(statuses).map(([k,v])=><option value={k} key={k}>{v[0]}</option>)}</select>
     </section>
 
-    <section className="stats">{Object.entries(statuses).map(([key, value]) => <span key={key}>{value[0]}: {list.filter(c=>c.status===key).length}</span>)}</section>
+    <section className="stats">{Object.entries(statuses).map(([key, value]) => <span key={key} className={value[1]}>{value[0]}: {list.filter(c=>c.status===key).length}</span>)}</section>
 
     {view === 'cards' ? <main className="cards-area">
       {current ? <ContactCard key={current.id} readOnly={repairBlocked} contact={current} patch={patch} chooseStatus={chooseStatus} startCall={startCall} edit={setEditing} editCall={(record,historyIndex)=>setCallEditing({contact:current,record,historyIndex})} removeCall={historyIndex=>{if(confirm('Smazat tento záznam hovoru?'))patch(current.id,updateHistory(current,(current.history || []).filter((h,i)=>i!==historyIndex)))}} remove={id=>{if(confirm('Opravdu smazat tento kontakt?'))changeContacts(c=>c.filter(x=>x.id!==id))}} /> : <p className="empty">{contacts.some(c=>c.type===type) ? 'Žádný kontakt neodpovídá filtru.' : 'V této sekci zatím nejsou žádné kontakty.'}</p>}
@@ -234,7 +234,7 @@ function ContactCard({ readOnly, contact:c, chooseStatus, startCall, edit, remov
     <a className="call" href={phoneLink(c.phone)} onClick={()=>startCall(c)}>{c.phone}</a>
     <div className="info"><label>Co přesně dělá<strong>{c.services || c.profession || 'neuvedeno'}</strong></label><label>Lokalita<strong>{[c.address, [c.postalCode,c.city].filter(Boolean).join(' '), c.district && `okres ${c.district}`].filter(Boolean).join(', ') || 'neuvedena'}</strong></label><label>E-mail<span>{c.email ? <a href={`mailto:${c.email}`}>{c.email}</a> : 'neuveden'}</span></label>{c.interest && <label>Zájem o<strong>{c.interest}</strong></label>}</div>
     {c.sourceInfo && <details className="source-info"><summary>Původní informace z PDF</summary><p>{c.sourceInfo}</p></details>}
-    <div className="status-buttons">{Object.entries(statuses).map(([key,value])=><button className={`${value[1]} ${c.status===key?'selected':''}`} onClick={()=>chooseStatus(c,key)} key={key}>{value[0]}</button>)}</div>
+    <div className="status-buttons">{Object.entries(statuses).map(([key,value])=><button className={`${value[1]} ${c.status===key?'selected':''}`} aria-pressed={c.status===key} onClick={()=>chooseStatus(c,key)} key={key}>{value[0]}</button>)}</div>
     {scheduled(c) && <p className={scheduleGroup(scheduled(c))==='overdue'?'overdue':''}><b>Další hovor: {new Date(scheduled(c)).toLocaleString('cs-CZ')}</b></p>}
     {c.note && <details><summary>Původní poznámka</summary><p>{c.note}</p></details>}
     <button className="primary" onClick={()=>editCall({status:c.status})}>Záznam hovoru</button>
