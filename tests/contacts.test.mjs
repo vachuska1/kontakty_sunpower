@@ -35,3 +35,8 @@ test('deleted migrated note does not reappear and started call keeps previous re
  const original={...c,history:[{id:'a',at:'2026-10-16',status:'callback',followUp:'2026-10-19'},{id:'b',at:'2026-10-17',status:'started',followUp:''}]}
  assert.equal(scheduled(original),'2026-10-19')
 })
+
+test('latest added call wins when timestamps match to the minute', () => {
+ const history=[{at:'2026-11-12T10:00:00.000Z',status:'very-interested',followUp:''},{at:'2026-11-12T10:00:00.000Z',status:'agreed',followUp:''}]
+ assert.equal(updateHistory({status:'new'},history).status,'agreed')
+})
